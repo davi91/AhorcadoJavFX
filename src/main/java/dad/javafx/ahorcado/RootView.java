@@ -19,6 +19,8 @@ public class RootView extends TabPane {
 		 
 		 tab2.setContent(pNode);
 		 
-		getTabs().addAll(tab1, tab2, tab3);
+		 // No cerramos las pestañas
+		 setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+		 getTabs().addAll(tab1, tab2, tab3);
 	}
 }
