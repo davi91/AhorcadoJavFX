@@ -49,7 +49,7 @@ public class AhorcadoApp extends Application {
 			
 			// Todas las palabras estarán en mayúsculas, si de antes había un fichero con otras palabras nos
 			// aseguramos de que se guarden en mayúsculas
-			for( String str : root.getoList() ) {
+			for( String str : root.getPalabrasList()) {
 				writer.write(str.toUpperCase()+"\n"); // Guardamos las palabras por lineas
 			}
 			

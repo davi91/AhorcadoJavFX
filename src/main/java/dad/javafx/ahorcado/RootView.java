@@ -1,26 +1,34 @@
 package dad.javafx.ahorcado;
 
-import java.io.IOException;
-
-import dad.javafx.palabras.PalabrasController;
-import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
 public class RootView extends TabPane {
 
-	public RootView(Node pNode) {
+	private Tab tab_game;
+	private Tab tab_palabras;
+	private Tab tab_puntuaciones;
+	
+	public RootView() {
 		
-		 Tab tab1 = new Tab("Partida");
-		 
-		 Tab tab2 = new Tab("Palabras");
-		 
-		 Tab tab3 = new Tab("Puntuaciones");
-		 
-		 tab2.setContent(pNode);
-		 
-		 // No cerramos las pestañas
-		 setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-		 getTabs().addAll(tab1, tab2, tab3);
+		tab_game = new Tab("Partida");
+		tab_palabras= new Tab("Palabras");
+		tab_puntuaciones = new Tab("Puntuaciones");
+
+		// No cerramos las pestañas
+		setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+		getTabs().addAll(tab_game, tab_palabras, tab_puntuaciones);
+	}
+
+	public Tab getTab_game() {
+		return tab_game;
+	}
+
+	public Tab getTab_palabras() {
+		return tab_palabras;
+	}
+
+	public Tab getTab_puntuaciones() {
+		return tab_puntuaciones;
 	}
 }

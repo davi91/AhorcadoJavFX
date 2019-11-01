@@ -2,6 +2,7 @@ package dad.javafx.palabras;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -10,6 +11,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,7 +25,7 @@ import javafx.scene.layout.BorderPane;
 
 /**
  * Controlador de la pestaña de "palabras" que básicamente consiste en una lista donde
- * se nos muestran las palabras del arhivo palabras.txt y se van a procesar en el juego.
+ * se nos muestran las palabras del archivo palabras.txt y se van a procesar en el juego.
  * Se tienen implementados los métodos para insertar y quitar palabras de la lista, cualquier
  * cambio en ella se quedará guardado al cerrar la aplicación.
  * 
@@ -49,9 +51,8 @@ public class PalabrasController implements Initializable {
 	//----------------------------------------------------------
 	
 	// Model
-	
-	// El observable list del RootController tiene la lista principal por la cual se va a manejar esta property
-	private ListProperty<String> list; 
+	private ObservableList<String> oList =  FXCollections.observableArrayList(new ArrayList<String>());
+	private ListProperty<String> list = new SimpleListProperty<>(oList); 
 	
 	private StringProperty palabraSelected = new SimpleStringProperty();
 	
@@ -63,9 +64,6 @@ public class PalabrasController implements Initializable {
 	public PalabrasController(RootController parentRoot) throws IOException {
 		
 		this.parentRoot = parentRoot;
-		
-		// Cargamos el modelo primero
-		list = new SimpleListProperty<>(this.parentRoot.getoList());
 		
 		FXMLLoader loader = new FXMLLoader( getClass().getResource("/fxml/PalabrasFXML.fxml"));
 		loader.setController(this);
@@ -122,9 +120,24 @@ public class PalabrasController implements Initializable {
 		}
 	}
 	
-	public BorderPane getBorderRoot() {
+	public BorderPane getRootView() {
 		return borderRoot;
 	}
+
+	public final ListProperty<String> listProperty() {
+		return this.list;
+	}
+	
+
+	public final ObservableList<String> getList() {
+		return this.listProperty().get();
+	}
+	
+
+	public final void setList(final ObservableList<String> list) {
+		this.listProperty().set(list);
+	}
+	
 	
 
 }

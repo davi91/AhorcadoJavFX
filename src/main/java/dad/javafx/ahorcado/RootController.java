@@ -2,16 +2,22 @@ package dad.javafx.ahorcado;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Optional;
 
+import dad.javafx.jugadores.Jugador;
+import dad.javafx.jugadores.JugadoresController;
 import dad.javafx.palabras.PalabrasController;
+import dad.javafx.partida.PartidaInicioController;
+import dad.javafx.partida.SeleccionJugadorDialog;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -21,30 +27,48 @@ import javafx.scene.control.Alert.AlertType;
  * principal de todos los demás Controller. El guardado de ficheros cuando se cierra la aplicación
  * la lleva la App.
  * <br><br>
- * <b> Importante: El fichero palabras.txt y puntuaciones.txt deben estar en la subcarpeta de recursos </b>
+ * <b> Importante: El fichero palabras.txt y jugadores.txt deben estar en la subcarpeta de recursos </b>
  * @author David Fernández Nieves
  *
  */
 public class RootController {
 
+	private enum e_listType {
+		
+			L_PALABRAS,
+			L_JUGADORES
+	};
+	
+	private static final String PALABRASURL = "/text/palabras.txt";
+	private static final String JUGADORESURL = "/text/jugadores.txt";
+	
 	// View
 	private RootView view;
-	
-	// Model
-	private ObservableList<String> oList =  FXCollections.observableArrayList(new ArrayList<String>());
 
 	// Las demás pestañas
 	private PalabrasController pController;
+	private JugadoresController jController;
+	private PartidaInicioController iController;
+	
+	// Model -> En general, las distintas vistas
+	private ObjectProperty<Node> gameNode = new SimpleObjectProperty<>(); // La pantalla de inicio y de juego
+	private ObjectProperty<Node> palabrasNode = new SimpleObjectProperty<>(); // La pantalla de palabras
+	private ObjectProperty<Node> jugadoresNode = new SimpleObjectProperty<>(); // La pantalla de jugadores
 	
 	public RootController() {
-
-		// Cargamos los ficheros de datos que contienen las palabras y los jugadores
-		cargarPalabras();
 		
 		// Cargamos por FXML todos los demás Controller
 		try {
 
+			// Aprovechando que los dos usan listas, podemos cargar los datos aquí
 			pController = new PalabrasController(this);
+			cargarDatos(PALABRASURL, e_listType.L_PALABRAS);
+			
+			jController = new JugadoresController(this);
+			cargarDatos(JUGADORESURL, e_listType.L_JUGADORES);
+			
+			// Ya este controlador se encarga de cargar sus propios datos
+			iController = new PartidaInicioController(this);
 			
 		} catch (IOException e) {
 			
@@ -56,21 +80,31 @@ public class RootController {
 		}
 		
 		// Por último, cargamos la vista principal
-		view = new RootView(pController.getBorderRoot());
+		view = new RootView();
+		view.getTab_game().contentProperty().bind(gameNode);
+		view.getTab_puntuaciones().contentProperty().bind(jugadoresNode);
+		view.getTab_palabras().contentProperty().bind(palabrasNode);
+		
+		gameNode.set(iController.getRootView()); // Empezamos con la vista inicial
+		jugadoresNode.set(jController.getRootView());
+		palabrasNode.set(pController.getRootView());
 	}
 	
-	private void cargarPalabras() {
+	/**
+	 * Cargamos los datos de los ficheros. Usada principalmente para la carga
+	 * de las listas.
+	 * @param filePath La ruta del fichero
+	 * @param listType Tipo de lista: jugadores o palabras.
+	 */
+	private void cargarDatos(String filePath, e_listType listType ) {
 		
-		FileInputStream file = null;
-		InputStreamReader in = null;
+		FileReader file = null;
 		BufferedReader reader = null;
 		
 		try {
 			
-		//	file = new FileInputStream(getClass().getResource("/text/palabras.txt").toString());
-			file = new FileInputStream("palabras.txt");
-			in = new InputStreamReader(file, StandardCharsets.UTF_8);
-			reader = new BufferedReader(in);
+			file = new FileReader(getClass().getResource(filePath).getFile());
+			reader = new BufferedReader(file);
 			
 			String line;
 			while( (line = reader.readLine()) != null ) {
@@ -79,44 +113,119 @@ public class RootController {
 				line.trim();
 				
 				// Vamos cargando las palabras en la lista
-				oList.add(line);
+				if( listType == e_listType.L_PALABRAS )
+				   pController.getList().add(line); 
+				
+				// Entonces son los jugadores
+				else if( listType == e_listType.L_JUGADORES ) {
+					
+					// El formato del jugador será "jugador,puntuacion"
+					String[] jArray = line.split(",");
+					jController.getListaJugador().add(new Jugador(jArray[0], Integer.parseInt(jArray[1])));
+				}
 			}
 			
-		} catch (IOException e) {
-			sendFileError("palabras.txt");
+		} catch (IOException | NumberFormatException e) {
+			sendFileError(filePath);
 		} finally {
 			
 			try {	
+				
 				if( reader != null )
 					reader.close();
-				
-				if( in != null )
-					in.close();
 				
 				if( file != null )
 					file.close();
 				
 			} catch (IOException e) {
-				sendFileError("palabras.txt");
+				sendFileError(filePath);
 			}
 		}
 	}
 	
-	private void sendFileError(String fileName) {
+	/**
+	 * Principal fallo a la hora de procesar un fichero, ya sea porque
+	 * no tiene el contenido correcto o porque no se puede acceder a el
+	 * @param fileName Nombre o rut adel fichero
+	 */
+	public void sendFileError(String fileName) {
 		
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("ERROR");
-		alert.setHeaderText("Error al procesar el fichero:" + fileName);
+		alert.setHeaderText("Error al procesar el fichero: " + fileName);
 		alert.setContentText("Compruebe que el fichero está en la subcarpeta resources y no esté abierto por ningún otro programa");
 		alert.showAndWait();
 		Platform.exit();
 	}
 	
+	/**
+	 * Inicamos la partida, cargamos un nuevo contenido.
+	 */
+	public void iniciarPartida() {
+		
+		SeleccionJugadorDialog dialog = new SeleccionJugadorDialog(jController.listaJugadorProperty());
+		Optional<Jugador> j = dialog.showAndWait();
+		
+		if( j.isPresent() ) {
+			// Aquí empezamos el juego
+		}
+	}
+	
 	public RootView getRootView() {
 		return view;
 	}
-	
-	public ObservableList<String> getoList() {
-		return oList;
+
+	/**
+	 * Lista de palabras.
+	 * @return La lista de palabras actual.
+	 */
+	public ArrayList<String> getPalabrasList() {
+		return new ArrayList<>(pController.getList());
 	}
+
+	public final ObjectProperty<Node> gameNodeProperty() {
+		return this.gameNode;
+	}
+	
+
+	public final Node getGameNode() {
+		return this.gameNodeProperty().get();
+	}
+	
+
+	public final void setGameNode(final Node gameNode) {
+		this.gameNodeProperty().set(gameNode);
+	}
+	
+
+	public final ObjectProperty<Node> palabrasNodeProperty() {
+		return this.palabrasNode;
+	}
+	
+
+	public final Node getPalabrasNode() {
+		return this.palabrasNodeProperty().get();
+	}
+	
+
+	public final void setPalabrasNode(final Node palabrasNode) {
+		this.palabrasNodeProperty().set(palabrasNode);
+	}
+	
+
+	public final ObjectProperty<Node> jugadoresNodeProperty() {
+		return this.jugadoresNode;
+	}
+	
+
+	public final Node getJugadoresNode() {
+		return this.jugadoresNodeProperty().get();
+	}
+	
+
+	public final void setJugadoresNode(final Node jugadoresNode) {
+		this.jugadoresNodeProperty().set(jugadoresNode);
+	}
+	
+	
 }
