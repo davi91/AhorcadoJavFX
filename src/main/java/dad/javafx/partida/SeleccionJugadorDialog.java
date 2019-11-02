@@ -1,9 +1,7 @@
 package dad.javafx.partida;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import dad.javafx.jugadores.Jugador;
 import javafx.beans.property.ListProperty;
@@ -48,7 +46,7 @@ public class SeleccionJugadorDialog extends Dialog<Jugador> {
 		icon.setFitHeight(48.f);
 		setGraphic(icon);
 		
-		// Nuestro contenido propio
+		// Nuestro contenido
 		createBt = new Button("Crear jugador");
 		listaJugador = new ListView<>();
 		listaJugador.setPrefHeight(128.f);
@@ -85,9 +83,13 @@ public class SeleccionJugadorDialog extends Dialog<Jugador> {
 		
 		setResultConverter( bt -> {
 			
-			// Buscamos en la lista de jugadores aquel nombre que coincida
-			String jName = listaJugador.getSelectionModel().getSelectedItem();
-			return playersList.stream().filter( j -> j.getNombre().equals(jName)).findFirst().get();
+			if( bt.getButtonData() == ButtonData.OK_DONE ) {
+				// Buscamos en la lista de jugadores aquel nombre que coincida
+				String jName = listaJugador.getSelectionModel().getSelectedItem();
+				return playersList.stream().filter( j -> j.getNombre().equals(jName)).findFirst().get();
+			}
+			
+			return null;
 	
 		});
 	}
@@ -109,7 +111,7 @@ public class SeleccionJugadorDialog extends Dialog<Jugador> {
 		
 		Optional<String> nombreJugador = dialog.showAndWait();
 		
-		if( nombreJugador.isPresent()) {
+		if( nombreJugador.isPresent() && !nombreJugador.get().isBlank() && !nombreJugador.get().isEmpty()) {
 			Jugador j = new Jugador(nombreJugador.get(), 0);
 			// Añadimos nuestro jugador a la lista principal
 			playersList.add(j); 

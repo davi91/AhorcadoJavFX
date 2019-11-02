@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 
 import dad.javafx.ahorcado.RootController;
+import dad.javafx.jugadores.Jugador;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -33,6 +34,7 @@ public class AhorcadoApp extends Application {
 		
 		// Guardamos todos los datos de jugadores y palabras
 		guardarPalabras();
+		guardarJugadores();
 	}
 	
 	private void guardarPalabras() {
@@ -43,18 +45,19 @@ public class AhorcadoApp extends Application {
 		
 		try {
 			
-			file = new FileOutputStream("palabras.txt");
+			file = new FileOutputStream(getClass().getResource(RootController.PALABRASURL).getFile());
 			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
 			writer = new BufferedWriter(out);
 			
 			// Todas las palabras estarán en mayúsculas, si de antes había un fichero con otras palabras nos
 			// aseguramos de que se guarden en mayúsculas
 			for( String str : root.getPalabrasList()) {
-				writer.write(str.toUpperCase()+"\n"); // Guardamos las palabras por lineas
+				writer.write(str.toUpperCase()); // Guardamos las palabras por lineas
+				writer.newLine();
 			}
 			
 		} catch (IOException e) {
-			sendFileError("palabras.txt");
+			sendFileError(RootController.PALABRASURL);
 		} finally {
 			
 			try {	
@@ -68,7 +71,44 @@ public class AhorcadoApp extends Application {
 					file.close();
 				
 			} catch (IOException e) {
-				sendFileError("palabras.txt");
+				sendFileError(RootController.PALABRASURL);
+			}
+		}
+	}
+	
+	private void guardarJugadores() {
+		
+		FileOutputStream file = null;
+		OutputStreamWriter out = null;
+		BufferedWriter writer = null;
+		
+		try {
+			
+			file = new FileOutputStream(getClass().getResource(RootController.JUGADORESURL).getFile());
+			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
+			writer = new BufferedWriter(out);
+			
+			for( Jugador j : root.getJugadoresList()) {
+				writer.write(j.getNombre() + "," + j.getPuntuacion()); // Guardamos las puntuaciones en el formato adecuado
+				writer.newLine();
+			}
+			
+		} catch (IOException e) {
+			sendFileError(RootController.JUGADORESURL);
+		} finally {
+			
+			try {	
+				if( writer != null )
+					writer.close();
+				
+				if( out != null )
+					out.close();
+				
+				if( file != null )
+					file.close();
+				
+			} catch (IOException e) {
+				sendFileError(RootController.JUGADORESURL);
 			}
 		}
 	}

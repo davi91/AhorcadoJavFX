@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -50,7 +51,7 @@ public class PartidaInicioController implements Initializable {
 	private ImageView helpIcon;
 	
 	@FXML
-	private Text helpText;
+	private Label helpText;
 	
 	//---------------------------------------------------------------
 	
@@ -121,7 +122,7 @@ public class PartidaInicioController implements Initializable {
 			StringBuilder myText = new StringBuilder();
 			
 			while( (line = buffer.readLine()) != null ) {
-				myText.append(line);
+				myText.append(line+"\n");
 			}
 			
 			help.set(myText.toString());

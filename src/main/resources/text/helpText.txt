@@ -1,2 +1,5 @@
-Para empezar a jugar pulsar el botón Iniciar Partida. Una vez se inicie la prtida deberá escoger un jugador o crear uno nuevo. 
-Cuando se acaben todas las vidas o se completen todas las palabras se acabará el juego. La puntuación del jugador se guardará siempre y cuando sea mayor que la que ya tenía.
+Para empezar a jugar pulsar el botón Iniciar Partida. Una vez se inicie la prtida deberá escoger un jugador o
+ crear uno nuevo. Cuando se acaben todas las vidas o se completen todas las palabras se acabará el juego. 
+La puntuación del jugador se guardará siempre y cuando sea mayor que la que ya tenía.
+
+IMPORTANTE: Como medida de seguridad. mientras se está jugando, se bloquerán las demás pestañas.

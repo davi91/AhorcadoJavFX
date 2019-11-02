@@ -12,10 +12,13 @@ import java.util.Optional;
 import dad.javafx.jugadores.Jugador;
 import dad.javafx.jugadores.JugadoresController;
 import dad.javafx.palabras.PalabrasController;
+import dad.javafx.partida.PartidaController;
 import dad.javafx.partida.PartidaInicioController;
 import dad.javafx.partida.SeleccionJugadorDialog;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -39,8 +42,8 @@ public class RootController {
 			L_JUGADORES
 	};
 	
-	private static final String PALABRASURL = "/text/palabras.txt";
-	private static final String JUGADORESURL = "/text/jugadores.txt";
+	public static final String PALABRASURL = "/text/palabras.txt";
+	public static final String JUGADORESURL = "/text/jugadores.txt";
 	
 	// View
 	private RootView view;
@@ -49,17 +52,20 @@ public class RootController {
 	private PalabrasController pController;
 	private JugadoresController jController;
 	private PartidaInicioController iController;
+	private PartidaController playController;
 	
 	// Model -> En general, las distintas vistas
 	private ObjectProperty<Node> gameNode = new SimpleObjectProperty<>(); // La pantalla de inicio y de juego
 	private ObjectProperty<Node> palabrasNode = new SimpleObjectProperty<>(); // La pantalla de palabras
 	private ObjectProperty<Node> jugadoresNode = new SimpleObjectProperty<>(); // La pantalla de jugadores
 	
+	// Nos sirve para bloquear las demás pestañas en caso de que se esté jugando
+	private BooleanProperty enJuego = new SimpleBooleanProperty(false);
+	
 	public RootController() {
 		
 		// Cargamos por FXML todos los demás Controller
 		try {
-
 			// Aprovechando que los dos usan listas, podemos cargar los datos aquí
 			pController = new PalabrasController(this);
 			cargarDatos(PALABRASURL, e_listType.L_PALABRAS);
@@ -84,6 +90,9 @@ public class RootController {
 		view.getTab_game().contentProperty().bind(gameNode);
 		view.getTab_puntuaciones().contentProperty().bind(jugadoresNode);
 		view.getTab_palabras().contentProperty().bind(palabrasNode);
+		
+		view.getTab_puntuaciones().disableProperty().bind(enJuego);
+		view.getTab_palabras().disableProperty().bind(enJuego);
 		
 		gameNode.set(iController.getRootView()); // Empezamos con la vista inicial
 		jugadoresNode.set(jController.getRootView());
@@ -167,8 +176,37 @@ public class RootController {
 		Optional<Jugador> j = dialog.showAndWait();
 		
 		if( j.isPresent() ) {
-			// Aquí empezamos el juego
+			
+			try {
+				playController = new PartidaController(this);
+				gameNode.set(playController.getRootView());
+				playController.setJugadorActual(j.get());
+				
+				// Bloqueamos las demás pestañas
+				enJuego.set(true);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	/**
+	 * Se ha acabado la partida, volvemos a establecer 
+	 * la vista por defecto
+	 */
+	public void finPartida() {
+		
+		// Volvemos a habilitar las pestañas
+		enJuego.set(false);
+		
+		try {
+			iController = new PartidaInicioController(this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		gameNode.set(iController.getRootView());
 	}
 	
 	public RootView getRootView() {
@@ -181,6 +219,14 @@ public class RootController {
 	 */
 	public ArrayList<String> getPalabrasList() {
 		return new ArrayList<>(pController.getList());
+	}
+
+	/**
+	 * Lista de jugadores.
+	 * @return La lista de jugadores actual.
+	 */
+	public ArrayList<Jugador> getJugadoresList() {
+		return new ArrayList<>(jController.getListaJugador());
 	}
 
 	public final ObjectProperty<Node> gameNodeProperty() {
