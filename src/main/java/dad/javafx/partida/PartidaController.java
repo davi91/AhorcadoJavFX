@@ -222,8 +222,33 @@ public class PartidaController implements Initializable {
 		final String palabraOriginal = listaPalabras.get(palabraActual);
 		
 		// Hay que evitar las letras repetidas
-		if( model.getUsado().indexOf(c) != -1 || model.getAdivinar().indexOf(c) != -1 ) {
+		if( model.getUsado().indexOf(c) != -1 ) {
 			return;
+		}
+		
+		if( model.getAdivinar().indexOf(c) != -1 ) {
+			
+			// Hay un caso particular, en caso de que haya letras repetidas y sólo se haya mostrado alguna de ellas
+			int n, j, i, m;
+			n = j = m = 0;
+			
+			// Calculamos el número de veces que está la letra en una u otra
+			while( (i = model.getAdivinar().indexOf(c,j)) != -1 ) {
+				j = i+1;
+				n++;
+			}
+			
+			j = 0;
+			while( (i = palabraOriginal.indexOf(c,j)) != -1 ) {
+				j = i+1;
+				m++;
+			}
+			
+			// Entonces es que están todas
+			if( m == n ) {
+				return;
+			}
+			
 		}
 		
 		if( palabraOriginal.indexOf(c) != -1) {
