@@ -19,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 /**
  * Este controlador se encarga de mostrar la pantalla de inicio del juego,

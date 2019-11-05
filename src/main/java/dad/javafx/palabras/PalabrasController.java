@@ -34,6 +34,7 @@ import javafx.scene.layout.BorderPane;
  */
 public class PalabrasController implements Initializable {
 
+	@SuppressWarnings("unused")
 	private RootController parentRoot;
 	
 	// FXML Related : View
