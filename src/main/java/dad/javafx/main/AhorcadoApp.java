@@ -1,10 +1,13 @@
 package dad.javafx.main;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import dad.javafx.ahorcado.RootController;
 import dad.javafx.jugadores.Jugador;
@@ -16,12 +19,16 @@ import javafx.stage.Stage;
 
 public class AhorcadoApp extends Application {
 
-	private RootController root = new RootController();
+
+	public static final String PALABRASURL = "/text/palabras.txt";
+	public static final String JUGADORESURL = "/text/jugadores.txt";
+
+	private RootController rootController = new RootController();
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
-		Scene scene = new Scene(root.getRootView(), 640, 480);
+		Scene scene = new Scene(rootController.getRootView(), 640, 480);
 		
 		primaryStage.setTitle("Juego del ahoracdo");
 		primaryStage.setScene(scene);
@@ -30,11 +37,108 @@ public class AhorcadoApp extends Application {
 	}
 
 	@Override
+	public void init() throws Exception {
+		super.init();
+		
+		// Cargamos los datos de la App
+		cargarJugadores();
+		cargarPalabras();
+	}
+
+	@Override
 	public void stop() throws Exception {
+		
+		super.stop();
 		
 		// Guardamos todos los datos de jugadores y palabras
 		guardarPalabras();
 		guardarJugadores();
+	}
+	
+	/**
+	 * Cargamos los datos de los jugadores y los situamos correctamente en la lista.
+	 */
+	private void cargarJugadores() {
+		
+		FileReader file = null;
+		BufferedReader reader = null;
+		ArrayList<Jugador> jList = new ArrayList<>();
+		
+		try {
+			
+			file = new FileReader(getClass().getResource(JUGADORESURL).getFile());
+			reader = new BufferedReader(file);
+			
+			String line;
+			while( (line = reader.readLine()) != null ) {
+				
+				// Limpiamos los espacios
+				line.trim();
+				String[] jArray = line.split(",");
+				jList.add(new Jugador(jArray[0], Integer.parseInt(jArray[1])));
+			}
+			
+			rootController.setJugadoresList(jList);
+			
+		} catch (IOException | NumberFormatException e) {
+			sendFileError(JUGADORESURL);
+		} finally {
+			
+			try {	
+				
+				if( reader != null )
+					reader.close();
+				
+				if( file != null )
+					file.close();
+				
+			} catch (IOException e) {
+				sendFileError(JUGADORESURL);
+			}
+		}
+	}
+	
+	/**
+	 * Cargamos los datos de las palabras y los situamos correctamente en la lista.
+	 */
+	private void cargarPalabras() {
+		
+		FileReader file = null;
+		BufferedReader reader = null;
+		ArrayList<String> pList = new ArrayList<>();
+		
+		try {
+			
+			file = new FileReader(getClass().getResource(PALABRASURL).getFile());
+			reader = new BufferedReader(file);
+			
+			String line;
+			while( (line = reader.readLine()) != null ) {
+				
+				// Limpiamos los espacios
+				line.trim();
+
+				pList.add(line);
+			}
+			
+			rootController.setPalabrasList(pList);
+			
+		} catch (IOException | NumberFormatException e) {
+			sendFileError(PALABRASURL);
+		} finally {
+			
+			try {	
+				
+				if( reader != null )
+					reader.close();
+				
+				if( file != null )
+					file.close();
+				
+			} catch (IOException e) {
+				sendFileError(PALABRASURL);
+			}
+		}
 	}
 	
 	private void guardarPalabras() {
@@ -45,19 +149,19 @@ public class AhorcadoApp extends Application {
 		
 		try {
 			
-			file = new FileOutputStream(getClass().getResource(RootController.PALABRASURL).getFile());
+			file = new FileOutputStream(getClass().getResource(PALABRASURL).getFile());
 			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
 			writer = new BufferedWriter(out);
 			
 			// Todas las palabras estarán en mayúsculas, si de antes había un fichero con otras palabras nos
 			// aseguramos de que se guarden en mayúsculas
-			for( String str : root.getPalabrasList()) {
+			for( String str : rootController.getPalabrasList()) {
 				writer.write(str.toUpperCase()); // Guardamos las palabras por lineas
 				writer.newLine();
 			}
 			
 		} catch (IOException e) {
-			sendFileError(RootController.PALABRASURL);
+			sendFileError(PALABRASURL);
 		} finally {
 			
 			try {	
@@ -71,7 +175,7 @@ public class AhorcadoApp extends Application {
 					file.close();
 				
 			} catch (IOException e) {
-				sendFileError(RootController.PALABRASURL);
+				sendFileError(PALABRASURL);
 			}
 		}
 	}
@@ -84,17 +188,17 @@ public class AhorcadoApp extends Application {
 		
 		try {
 			
-			file = new FileOutputStream(getClass().getResource(RootController.JUGADORESURL).getFile());
+			file = new FileOutputStream(getClass().getResource(JUGADORESURL).getFile());
 			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
 			writer = new BufferedWriter(out);
 			
-			for( Jugador j : root.getJugadoresList()) {
+			for( Jugador j : rootController.getJugadoresList()) {
 				writer.write(j.getNombre() + "," + j.getPuntuacion()); // Guardamos las puntuaciones en el formato adecuado
 				writer.newLine();
 			}
 			
 		} catch (IOException e) {
-			sendFileError(RootController.JUGADORESURL);
+			sendFileError(JUGADORESURL);
 		} finally {
 			
 			try {	
@@ -108,7 +212,7 @@ public class AhorcadoApp extends Application {
 					file.close();
 				
 			} catch (IOException e) {
-				sendFileError(RootController.JUGADORESURL);
+				sendFileError(JUGADORESURL);
 			}
 		}
 	}

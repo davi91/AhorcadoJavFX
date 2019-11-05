@@ -20,6 +20,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -35,15 +36,6 @@ import javafx.scene.control.Alert.AlertType;
  *
  */
 public class RootController {
-
-	private enum e_listType {
-		
-			L_PALABRAS,
-			L_JUGADORES
-	};
-	
-	public static final String PALABRASURL = "/text/palabras.txt";
-	public static final String JUGADORESURL = "/text/jugadores.txt";
 	
 	// View
 	private RootView view;
@@ -68,10 +60,8 @@ public class RootController {
 		try {
 			// Aprovechando que los dos usan listas, podemos cargar los datos aquí
 			pController = new PalabrasController(this);
-			cargarDatos(PALABRASURL, e_listType.L_PALABRAS);
 			
 			jController = new JugadoresController(this);
-			cargarDatos(JUGADORESURL, e_listType.L_JUGADORES);
 			
 			// Ya este controlador se encarga de cargar sus propios datos
 			iController = new PartidaInicioController(this);
@@ -99,58 +89,6 @@ public class RootController {
 		palabrasNode.set(pController.getRootView());
 	}
 	
-	/**
-	 * Cargamos los datos de los ficheros. Usada principalmente para la carga
-	 * de las listas.
-	 * @param filePath La ruta del fichero
-	 * @param listType Tipo de lista: jugadores o palabras.
-	 */
-	private void cargarDatos(String filePath, e_listType listType ) {
-		
-		FileReader file = null;
-		BufferedReader reader = null;
-		
-		try {
-			
-			file = new FileReader(getClass().getResource(filePath).getFile());
-			reader = new BufferedReader(file);
-			
-			String line;
-			while( (line = reader.readLine()) != null ) {
-				
-				// Limpiamos los espacios
-				line.trim();
-				
-				// Vamos cargando las palabras en la lista
-				if( listType == e_listType.L_PALABRAS )
-				   pController.getList().add(line); 
-				
-				// Entonces son los jugadores
-				else if( listType == e_listType.L_JUGADORES ) {
-					
-					// El formato del jugador será "jugador,puntuacion"
-					String[] jArray = line.split(",");
-					jController.getListaJugador().add(new Jugador(jArray[0], Integer.parseInt(jArray[1])));
-				}
-			}
-			
-		} catch (IOException | NumberFormatException e) {
-			sendFileError(filePath);
-		} finally {
-			
-			try {	
-				
-				if( reader != null )
-					reader.close();
-				
-				if( file != null )
-					file.close();
-				
-			} catch (IOException e) {
-				sendFileError(filePath);
-			}
-		}
-	}
 	
 	/**
 	 * Principal fallo a la hora de procesar un fichero, ya sea porque
@@ -233,6 +171,21 @@ public class RootController {
 		return this.gameNode;
 	}
 	
+	/**
+	 * Ajustamos la lista de jugadores
+	 * @param jList ArrayList de jugadores
+	 */
+	public void setJugadoresList(ArrayList<Jugador> jList) {
+		jController.setListaJugador(FXCollections.observableArrayList(jList));
+	}
+	
+	/**
+	 * Ajustamos la lista de palabras
+	 * @param pList ArrayList de Strings conteniendo las palabras
+	 */
+	public void setPalabrasList(ArrayList<String> pList) {
+		pController.setList(FXCollections.observableArrayList(pList));
+	}
 
 	public final Node getGameNode() {
 		return this.gameNodeProperty().get();
