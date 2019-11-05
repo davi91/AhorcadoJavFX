@@ -54,9 +54,9 @@ public class RootController {
 		// Cargamos por FXML todos los demás Controller
 		try {
 			// Aprovechando que los dos usan listas, podemos cargar los datos aquí
-			pController = new PalabrasController(this);
+			pController = new PalabrasController();
 			
-			jController = new JugadoresController(this);
+			jController = new JugadoresController();
 			
 			// Ya este controlador se encarga de cargar sus propios datos
 			iController = new PartidaInicioController(this);

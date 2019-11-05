@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import dad.javafx.ahorcado.RootController;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -34,8 +33,6 @@ import javafx.scene.layout.BorderPane;
  */
 public class PalabrasController implements Initializable {
 
-	@SuppressWarnings("unused")
-	private RootController parentRoot;
 	
 	// FXML Related : View
 	//----------------------------------------------------------
@@ -62,10 +59,8 @@ public class PalabrasController implements Initializable {
 	 * @param parentRoot El controlador principal
 	 * @throws IOException Error en la carga del FXML PalabrasFXML.fxml
 	 */
-	public PalabrasController(RootController parentRoot) throws IOException {
-		
-		this.parentRoot = parentRoot;
-		
+	public PalabrasController() throws IOException {
+				
 		FXMLLoader loader = new FXMLLoader( getClass().getResource("/fxml/PalabrasFXML.fxml"));
 		loader.setController(this);
 		loader.load();

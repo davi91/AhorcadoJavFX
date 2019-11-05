@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import dad.javafx.ahorcado.RootController;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -18,8 +17,6 @@ import javafx.scene.layout.BorderPane;
 
 public class JugadoresController implements Initializable {
 
-	@SuppressWarnings("unused")
-	private RootController parentRoot;
 	
 	// FXML : View
 	//-----------------------------------------------------
@@ -36,10 +33,8 @@ public class JugadoresController implements Initializable {
 	private ObservableList<Jugador> jList = FXCollections.observableArrayList(new ArrayList<Jugador>());
 	private ListProperty<Jugador> list =  new SimpleListProperty<>(jList);;
 	
-	public JugadoresController(RootController parentRoot) throws IOException {
-		
-		this.parentRoot = parentRoot;
-		
+	public JugadoresController() throws IOException {
+				
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/JugadoresFXML.fxml"));
 		loader.setController(this);
 		loader.load();
