@@ -29,8 +29,7 @@ import javafx.util.converter.NumberStringConverter;
  * no podrá cambiar de pestaña.
  * <br>
  * <br>
- * Los puntos sólo se guardarán si el jugador ha acabdo la partida o, al menos,
- * adivinado una palabra.
+ * Los puntos sólo se guardarán si el jugador ha acabdo la partida.
  * 
  * @author David Fernández Nieves
  *

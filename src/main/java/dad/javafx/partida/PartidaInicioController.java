@@ -1,14 +1,14 @@
 package dad.javafx.partida;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
 import dad.javafx.ahorcado.RootController;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -16,7 +16,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
@@ -34,7 +33,6 @@ public class PartidaInicioController implements Initializable {
 
 	private RootController rootController;
 	
-	private static final String IMAGEURL = "/images/helpIcon.png";
 	private static final String HELPURL = "/text/helpText.txt";
 	
 	// FXML : View
@@ -57,8 +55,6 @@ public class PartidaInicioController implements Initializable {
 	// Model
 	//---------------------------------------------------------------
 	
-	private ObjectProperty<Image> image = new SimpleObjectProperty<>();
-	
 	private StringProperty help = new SimpleStringProperty();
 	
 	//---------------------------------------------------------------
@@ -76,18 +72,6 @@ public class PartidaInicioController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		
 		// Ajustamos los diferentes componentes de la vista, para ello usamos el modelo
-		
-		
-		helpIcon.imageProperty().bind(image);
-		
-		try {
-			
-			image.set( new Image(getClass().getResource(IMAGEURL).toString()));
-			
-		} catch (NullPointerException | IllegalArgumentException e) {
-			
-			rootController.sendFileError(IMAGEURL);
-		}
 		
 		helpText.textProperty().bind(help);
 		loadTextInfo();
@@ -109,13 +93,15 @@ public class PartidaInicioController implements Initializable {
 	 */
 	private void loadTextInfo() {
 		
-		FileReader reader = null;
+		FileInputStream reader = null;
+		InputStreamReader in = null;
 		BufferedReader buffer = null;
 		
 		try {
 			
-			reader = new FileReader(getClass().getResource(HELPURL).getFile());
-			buffer = new BufferedReader(reader);
+			reader = new FileInputStream(getClass().getResource(HELPURL).getFile());
+			in = new InputStreamReader(reader, StandardCharsets.UTF_8);
+			buffer = new BufferedReader(in);
 			
 			String line;
 			StringBuilder myText = new StringBuilder();
@@ -133,6 +119,10 @@ public class PartidaInicioController implements Initializable {
 			try {
 				if( buffer != null ) {
 					buffer.close();
+				}
+				
+				if( in != null ) {
+					in.close();
 				}
 				
 				if( reader != null ) {
