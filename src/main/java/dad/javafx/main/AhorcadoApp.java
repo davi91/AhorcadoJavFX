@@ -2,10 +2,9 @@ package dad.javafx.main;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,8 +20,8 @@ import javafx.stage.Stage;
 public class AhorcadoApp extends Application {
 
 
-	public static final String PALABRASURL = "/text/palabras.txt";
-	public static final String JUGADORESURL = "/text/jugadores.txt";
+	public static final String PALABRASURL = "text/palabras.txt";
+	public static final String JUGADORESURL = "text/jugadores.txt";
 
 	private RootController rootController = new RootController();
 	
@@ -61,16 +60,14 @@ public class AhorcadoApp extends Application {
 	 */
 	private void cargarJugadores() {
 		
-		FileInputStream file = null;
-		InputStreamReader in = null;
+		FileReader file = null;
 		BufferedReader reader = null;
 		ArrayList<Jugador> jList = new ArrayList<>();
 		
 		try {
 			
-			file = new FileInputStream(getClass().getResource(JUGADORESURL).getFile());
-			in = new InputStreamReader(file, StandardCharsets.UTF_8);
-			reader = new BufferedReader(in);
+			file = new FileReader(JUGADORESURL);
+			reader = new BufferedReader(file);
 			
 			String line;
 			while( (line = reader.readLine()) != null ) {
@@ -92,10 +89,6 @@ public class AhorcadoApp extends Application {
 				if( reader != null )
 					reader.close();
 				
-				if( in != null ) {
-					in.close();
-				}
-				
 				if( file != null )
 					file.close();
 				
@@ -110,16 +103,14 @@ public class AhorcadoApp extends Application {
 	 */
 	private void cargarPalabras() {
 		
-		FileInputStream file = null;
-		InputStreamReader in = null;
+		FileReader file = null;
 		BufferedReader reader = null;
 		ArrayList<String> pList = new ArrayList<>();
 		
 		try {
 			
-			file = new FileInputStream(getClass().getResource(PALABRASURL).getFile());
-			in = new InputStreamReader(file, StandardCharsets.UTF_8);
-			reader = new BufferedReader(in);
+			file = new FileReader(PALABRASURL);
+			reader = new BufferedReader(file);
 			
 			String line;
 			while( (line = reader.readLine()) != null ) {
@@ -141,10 +132,6 @@ public class AhorcadoApp extends Application {
 				if( reader != null )
 					reader.close();
 				
-				if( in != null ) {
-					in.close();
-				}
-				
 				if( file != null )
 					file.close();
 				
@@ -162,7 +149,7 @@ public class AhorcadoApp extends Application {
 		
 		try {
 			
-			file = new FileOutputStream(getClass().getResource(PALABRASURL).getFile());
+			file = new FileOutputStream(PALABRASURL);
 			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
 			writer = new BufferedWriter(out);
 			
@@ -201,7 +188,7 @@ public class AhorcadoApp extends Application {
 		
 		try {
 			
-			file = new FileOutputStream(getClass().getResource(JUGADORESURL).getFile());
+			file = new FileOutputStream(JUGADORESURL);
 			out = new OutputStreamWriter(file, StandardCharsets.UTF_8);
 			writer = new BufferedWriter(out);
 			
