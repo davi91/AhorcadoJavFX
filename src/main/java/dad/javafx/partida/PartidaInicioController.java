@@ -3,6 +3,7 @@ package dad.javafx.partida;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -93,13 +94,13 @@ public class PartidaInicioController implements Initializable {
 	 */
 	private void loadTextInfo() {
 		
-		FileInputStream reader = null;
+		InputStream reader = null;
 		InputStreamReader in = null;
 		BufferedReader buffer = null;
 		
 		try {
 			
-			reader = new FileInputStream(getClass().getResource(HELPURL).getFile());
+			reader = getClass().getResourceAsStream(HELPURL); // Método correcto pada diferentes plataformas
 			in = new InputStreamReader(reader, StandardCharsets.UTF_8);
 			buffer = new BufferedReader(in);
 			
